@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Envíos · Argentina</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:       #2563eb;
+      --primary-dark:  #1d4ed8;
+      --primary-light: #dbeafe;
+      --bg:            #f1f5f9;
+      --card:          #ffffff;
+      --border:        #e2e8f0;
+      --text:          #1e293b;
+      --muted:         #64748b;
+      --danger:        #ef4444;
+      --radius:        14px;
+      --shadow:        0 4px 6px -1px rgba(0,0,0,.08), 0 2px 4px -2px rgba(0,0,0,.06);
+      --shadow-lg:     0 10px 25px -3px rgba(0,0,0,.12), 0 4px 6px -4px rgba(0,0,0,.08);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 16px 48px;
+    }
+
+    .container { max-width: 660px; margin: 0 auto; }
+
+    /* ── HEADER ─────────────────────────────────────────── */
+    header { text-align: center; margin-bottom: 36px; }
+
+    .logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .logo-icon {
+      width: 52px; height: 52px;
+      background: var(--primary);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(37,99,235,.35);
+    }
+
+    .logo-icon svg { width: 30px; height: 30px; fill: #fff; }
+
+    h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -.02em; }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-top: 4px;
+    }
+
+    /* ── CARDS ──────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .section-label {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: '';
+      width: 3px; height: 14px;
+      background: var(--primary);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ── FORM ───────────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+    label { font-size: .875rem; font-weight: 600; color: var(--text); }
+
+    .input-wrap { position: relative; }
+
+    .input-prefix {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: .9rem;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-size: .95rem;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    input.with-prefix { padding-left: 26px; }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    input.invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(239,68,68,.14);
+    }
+
+    .err {
+      font-size: .78rem;
+      color: var(--danger);
+      min-height: 1.1em;
+      display: none;
+    }
+    .err.show { display: block; }
+
+    .vol-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 12px;
+    }
+
+    .vol-toggle input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .vol-preview {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: 8px;
+      min-height: 1.1em;
+    }
+
+    .cp-preview {
+      font-size: .78rem;
+      color: var(--primary);
+      font-weight: 600;
+      min-height: 1.1em;
+    }
+
+    /* ── BUTTON ─────────────────────────────────────────── */
+    .btn {
+      width: 100%;
+      margin-top: 4px;
+      padding: 13px 24px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .15s, transform .1s, box-shadow .15s;
+      box-shadow: 0 4px 10px rgba(37,99,235,.3);
+    }
+
+    .btn:hover { background: var(--primary-dark); box-shadow: 0 6px 14px rgba(37,99,235,.35); }
+    .btn:active { transform: scale(.985); }
+
+    /* ── RESULT ─────────────────────────────────────────── */
+    #resultCard {
+      display: none;
+      background: linear-gradient(140deg, #1e3a8a 0%, #2563eb 55%, #3b82f6 100%);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-lg);
+      animation: slideIn .25s ease;
+    }
+
+    #resultCard.show { display: block; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .res-label {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      opacity: .75;
+      margin-bottom: 14px;
+    }
+
+    .res-route {
+      background: rgba(255,255,255,.14);
+      border-radius: 9px;
+      padding: 12px 16px;
+      font-size: .9rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .res-route .arrow { opacity: .6; font-size: 1.1rem; flex-shrink: 0; }
+
+    .res-chips {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .chip {
+      background: rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    .chip-label {
+      font-size: .7rem;
+      opacity: .7;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 5px;
+    }
+
+    .chip-val { font-size: 1.05rem; font-weight: 700; }
+
+    .res-total {
+      background: rgba(255,255,255,.18);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .res-total-label { font-size: .85rem; opacity: .8; margin-bottom: 6px; }
+    .res-total-value { font-size: 2.6rem; font-weight: 800; letter-spacing: -.03em; }
+    .res-total-breakdown { font-size: .8rem; opacity: .65; margin-top: 6px; }
+
+    /* ── NOTICE ─────────────────────────────────────────── */
+    .notice {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      border-radius: 9px;
+      padding: 14px 16px;
+      font-size: .82rem;
+      color: #78350f;
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+
+    .notice strong { display: block; margin-bottom: 3px; color: #92400e; }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem;
+      margin-top: 8px;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 500px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .res-chips { grid-template-columns: 1fr 1fr; }
+      h1 { font-size: 1.45rem; }
+      .res-total-value { font-size: 2.1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-wrap">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34
+                   3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83
+                   0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5
+                   1.5zm13.5-9 1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5
+                   1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+        </svg>
+      </div>
+      <h1>Calculadora de Envíos</h1>
+    </div>
+    <p class="subtitle">Estimación por código postal · Argentina · Sin API externa</p>
+  </header>
+
+  <!-- TARIFA BASE, PRECIO POR KM Y PRECIO POR KG -->
+  <div class="card">
+    <div class="section-label">Configuración de Tarifas</div>
+    <div class="grid-3">
+
+      <div class="form-group">
+        <label for="tarifaBase">Tarifa Base (ARS)</label>
+        <div class="input-wrap">
+          <span class="input-prefix">$</span>
+          <input type="number" id="tarifaBase" class="with-prefix"
+                 value="500" min="0" step="50" placeholder="500">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="precioPorKm">Precio por km (ARS)</label>
+        <div class="input-wrap">
+          <span class="input-prefix">$</span>
+          <input type="number" id="precioPorKm" class="with-prefix"
+                 value="150" min="0" step="10" placeholder="150">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="precioPorKg">Precio por kg (ARS)</label>
+        <div class="input-wrap">
+          <span class="input-prefix">$</span>
+          <input type="number" id="precioPorKg" class="with-prefix"
+                 value="200" min="0" step="10" placeholder="200">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FORM DE CPs Y PESO -->
+  <div class="card">
+    <div class="section-label">Datos del Envío</div>
+    <div class="grid-2" style="margin-bottom: 16px;">
+
+      <div class="form-group">
+        <label for="cpOrigen">Código Postal Origen</label>
+        <input type="text" id="cpOrigen" placeholder="ej: 1000" maxlength="8"
+               inputmode="numeric">
+        <div class="cp-preview" id="previewOrigen"></div>
+        <span class="err" id="errOrigen"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="cpDestino">Código Postal Destino</label>
+        <input type="text" id="cpDestino" placeholder="ej: 5000" maxlength="8"
+               inputmode="numeric">
+        <div class="cp-preview" id="previewDestino"></div>
+        <span class="err" id="errDestino"></span>
+      </div>
+
+    </div>
+
+    <div class="form-group" style="margin-bottom: 16px;">
+      <label for="pesoKg">Peso del paquete (kg)</label>
+      <div class="input-wrap">
+        <input type="number" id="pesoKg" value="1" min="0" step="0.5" placeholder="1">
+      </div>
+    </div>
+
+    <label class="vol-toggle">
+      <input type="checkbox" id="usarVolumen" onchange="toggleVolumen()">
+      Agregar dimensiones (peso volumétrico, opcional)
+    </label>
+
+    <div id="volumenSection" style="display:none; margin-bottom:16px;">
+      <div class="grid-3" style="margin-bottom:8px;">
+        <div class="form-group">
+          <label for="largo">Largo (cm)</label>
+          <input type="number" id="largo" min="1" step="1" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label for="ancho">Ancho (cm)</label>
+          <input type="number" id="ancho" min="1" step="1" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label for="alto">Alto (cm)</label>
+          <input type="number" id="alto" min="1" step="1" placeholder="0">
+        </div>
+      </div>
+      <div class="vol-preview" id="volPreview"></div>
+    </div>
+
+    <button class="btn" id="btnCalc" onclick="calcular()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9
+                 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+      </svg>
+      Calcular Costo
+    </button>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="resultCard">
+    <div class="res-label">Resultado del cálculo</div>
+
+    <div class="res-route" id="resRoute">
+      <!-- llenado por JS -->
+    </div>
+
+    <div class="res-chips">
+      <div class="chip">
+        <div class="chip-label">Dist. aérea</div>
+        <div class="chip-val" id="distAerea">—</div>
+      </div>
+      <div class="chip">
+        <div class="chip-label">Dist. por ruta*</div>
+        <div class="chip-val" id="distRuta">—</div>
+      </div>
+      <div class="chip">
+        <div class="chip-label">Peso</div>
+        <div class="chip-val" id="chipPeso">—</div>
+      </div>
+      <div class="chip">
+        <div class="chip-label">Factor ruta</div>
+        <div class="chip-val">× 1.35</div>
+      </div>
+    </div>
+
+    <div class="res-total">
+      <div class="res-total-label">Costo total estimado</div>
+      <div class="res-total-value" id="costoTotal">$0</div>
+      <div class="res-total-breakdown" id="costoBreakdown"></div>
+    </div>
+  </div>
+
+  <!-- AVISO -->
+  <div class="notice">
+    <strong>Estimación aproximada</strong>
+    La distancia por ruta se calcula multiplicando la distancia aérea (fórmula de Haversine)
+    por un factor de 1.35. Los CP se resuelven al centro urbano más cercano en la base de datos.
+    Las tarifas se guardan automáticamente en el navegador.
+  </div>
+
+  <footer>
+    Calculadora offline · Cubre los 4 dígitos del sistema postal argentino
+  </footer>
+
+</div><!-- /container -->
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+//  BASE DE DATOS: Códigos Postales de Argentina → coordenadas geográficas
+// ════════════════════════════════════════════════════════════════════════════
+const CP_DB = [
+  // ── CABA ──────────────────────────────────────────────────────────────────
+  { cp: 1000, ciudad: 'Buenos Aires (Microcentro)',       prov: 'CABA',                  lat: -34.6037, lng: -58.3816 },
+  { cp: 1200, ciudad: 'Buenos Aires (Palermo/Recoleta)',  prov: 'CABA',                  lat: -34.5850, lng: -58.4100 },
+  { cp: 1400, ciudad: 'Buenos Aires (Flores/Paternal)',   prov: 'CABA',                  lat: -34.6300, lng: -58.4500 },
+  // ── GBA Norte ─────────────────────────────────────────────────────────────
+  { cp: 1600, ciudad: 'General San Martín',               prov: 'Buenos Aires',           lat: -34.5667, lng: -58.5333 },
+  { cp: 1630, ciudad: 'Tigre / San Fernando',             prov: 'Buenos Aires',           lat: -34.4333, lng: -58.5667 },
+  { cp: 1660, ciudad: 'José León Suárez',                 prov: 'Buenos Aires',           lat: -34.5333, lng: -58.5667 },
+  // ── GBA Oeste ─────────────────────────────────────────────────────────────
+  { cp: 1700, ciudad: 'Ramos Mejía',                      prov: 'Buenos Aires',           lat: -34.6333, lng: -58.5667 },
+  { cp: 1750, ciudad: 'San Justo',                         prov: 'Buenos Aires',           lat: -34.6667, lng: -58.5667 },
+  { cp: 1770, ciudad: 'Tapiales / Villa Luzuriaga',       prov: 'Buenos Aires',           lat: -34.6833, lng: -58.5500 },
+  // ── GBA Sur ───────────────────────────────────────────────────────────────
+  { cp: 1800, ciudad: 'Lanús',                             prov: 'Buenos Aires',           lat: -34.7000, lng: -58.4000 },
+  { cp: 1842, ciudad: 'Monte Grande',                      prov: 'Buenos Aires',           lat: -34.8167, lng: -58.4667 },
+  { cp: 1870, ciudad: 'Avellaneda',                        prov: 'Buenos Aires',           lat: -34.6667, lng: -58.3667 },
+  { cp: 1900, ciudad: 'La Plata',                          prov: 'Buenos Aires',           lat: -34.9215, lng: -57.9545 },
+  { cp: 1980, ciudad: 'Chascomús',                         prov: 'Buenos Aires',           lat: -35.5667, lng: -58.0167 },
+  // ── Santa Fe ──────────────────────────────────────────────────────────────
+  { cp: 2000, ciudad: 'Rosario',                           prov: 'Santa Fe',               lat: -32.9468, lng: -60.6393 },
+  { cp: 2100, ciudad: 'Cañada de Gómez',                   prov: 'Santa Fe',               lat: -32.8167, lng: -61.3833 },
+  { cp: 2200, ciudad: 'San Nicolás de los Arroyos',        prov: 'Buenos Aires',           lat: -33.3333, lng: -60.2167 },
+  { cp: 2300, ciudad: 'Rafaela',                           prov: 'Santa Fe',               lat: -31.2500, lng: -61.4833 },
+  { cp: 2400, ciudad: 'Reconquista',                       prov: 'Santa Fe',               lat: -29.1500, lng: -59.6500 },
+  { cp: 2500, ciudad: 'Pergamino',                         prov: 'Buenos Aires',           lat: -33.8833, lng: -60.5667 },
+  { cp: 2600, ciudad: 'Venado Tuerto',                     prov: 'Santa Fe',               lat: -33.7333, lng: -61.9667 },
+  { cp: 2700, ciudad: 'Junín',                             prov: 'Buenos Aires',           lat: -34.5833, lng: -60.9500 },
+  { cp: 2800, ciudad: 'Zárate',                            prov: 'Buenos Aires',           lat: -34.1000, lng: -59.0333 },
+  { cp: 2900, ciudad: 'San Pedro',                         prov: 'Buenos Aires',           lat: -33.6667, lng: -59.6667 },
+  // ── Litoral ───────────────────────────────────────────────────────────────
+  { cp: 3000, ciudad: 'Santa Fe',                          prov: 'Santa Fe',               lat: -31.6333, lng: -60.7000 },
+  { cp: 3100, ciudad: 'Paraná',                            prov: 'Entre Ríos',             lat: -31.7333, lng: -60.5333 },
+  { cp: 3200, ciudad: 'Gualeguaychú',                      prov: 'Entre Ríos',             lat: -33.0167, lng: -58.5167 },
+  { cp: 3260, ciudad: 'Concordia',                         prov: 'Entre Ríos',             lat: -31.3833, lng: -58.0167 },
+  { cp: 3300, ciudad: 'Posadas',                           prov: 'Misiones',               lat: -27.3621, lng: -55.8969 },
+  { cp: 3360, ciudad: 'Oberá',                             prov: 'Misiones',               lat: -27.4833, lng: -55.1167 },
+  { cp: 3380, ciudad: 'Puerto Iguazú',                     prov: 'Misiones',               lat: -25.5997, lng: -54.5783 },
+  { cp: 3400, ciudad: 'Corrientes',                        prov: 'Corrientes',             lat: -27.4806, lng: -58.8341 },
+  { cp: 3460, ciudad: 'Goya',                              prov: 'Corrientes',             lat: -29.1500, lng: -59.2667 },
+  { cp: 3500, ciudad: 'Resistencia',                       prov: 'Chaco',                  lat: -27.4514, lng: -58.9867 },
+  { cp: 3560, ciudad: 'Presidencia Roque Sáenz Peña',      prov: 'Chaco',                  lat: -26.7833, lng: -60.4500 },
+  { cp: 3600, ciudad: 'Formosa',                           prov: 'Formosa',                lat: -26.1775, lng: -58.1781 },
+  // ── NOA ───────────────────────────────────────────────────────────────────
+  { cp: 4000, ciudad: 'San Miguel de Tucumán',             prov: 'Tucumán',                lat: -26.8083, lng: -65.2176 },
+  { cp: 4200, ciudad: 'Santiago del Estero',               prov: 'Santiago del Estero',    lat: -27.7951, lng: -64.2615 },
+  { cp: 4400, ciudad: 'Salta',                             prov: 'Salta',                  lat: -24.7859, lng: -65.4116 },
+  { cp: 4530, ciudad: 'Tartagal',                          prov: 'Salta',                  lat: -22.5333, lng: -63.8000 },
+  { cp: 4600, ciudad: 'San Salvador de Jujuy',             prov: 'Jujuy',                  lat: -24.1858, lng: -65.2995 },
+  { cp: 4650, ciudad: 'Humahuaca',                         prov: 'Jujuy',                  lat: -23.2000, lng: -65.3500 },
+  { cp: 4700, ciudad: 'San Fernando del Valle de Catamarca', prov: 'Catamarca',            lat: -28.4696, lng: -65.7852 },
+  // ── Córdoba, Cuyo y La Rioja ──────────────────────────────────────────────
+  { cp: 5000, ciudad: 'Córdoba',                           prov: 'Córdoba',                lat: -31.4167, lng: -64.1833 },
+  { cp: 5100, ciudad: 'Villa María',                       prov: 'Córdoba',                lat: -32.4167, lng: -63.2333 },
+  { cp: 5200, ciudad: 'Bell Ville',                        prov: 'Córdoba',                lat: -32.6167, lng: -62.7000 },
+  { cp: 5300, ciudad: 'La Rioja',                          prov: 'La Rioja',               lat: -29.4133, lng: -66.8558 },
+  { cp: 5400, ciudad: 'San Juan',                          prov: 'San Juan',               lat: -31.5375, lng: -68.5364 },
+  { cp: 5500, ciudad: 'Mendoza',                           prov: 'Mendoza',                lat: -32.8908, lng: -68.8272 },
+  { cp: 5600, ciudad: 'San Rafael',                        prov: 'Mendoza',                lat: -34.6178, lng: -68.3300 },
+  { cp: 5700, ciudad: 'San Luis',                          prov: 'San Luis',               lat: -33.2956, lng: -66.3356 },
+  { cp: 5800, ciudad: 'Río Cuarto',                        prov: 'Córdoba',                lat: -33.1232, lng: -64.3493 },
+  { cp: 5900, ciudad: 'Villa Mercedes',                    prov: 'San Luis',               lat: -33.6667, lng: -65.4667 },
+  // ── Buenos Aires Interior y La Pampa ─────────────────────────────────────
+  { cp: 6000, ciudad: 'Mercedes',                          prov: 'Buenos Aires',           lat: -34.6500, lng: -59.4333 },
+  { cp: 6100, ciudad: 'Chivilcoy',                         prov: 'Buenos Aires',           lat: -34.8833, lng: -60.0167 },
+  { cp: 6200, ciudad: 'Pehuajó',                           prov: 'Buenos Aires',           lat: -35.8167, lng: -61.9000 },
+  { cp: 6300, ciudad: 'Santa Rosa',                        prov: 'La Pampa',               lat: -36.6167, lng: -64.2833 },
+  { cp: 6360, ciudad: 'General Pico',                      prov: 'La Pampa',               lat: -35.6556, lng: -63.7569 },
+  { cp: 6400, ciudad: 'Trenque Lauquen',                   prov: 'Buenos Aires',           lat: -35.9667, lng: -62.7333 },
+  { cp: 6500, ciudad: '9 de Julio',                        prov: 'Buenos Aires',           lat: -35.4500, lng: -60.8833 },
+  { cp: 6700, ciudad: 'Luján',                             prov: 'Buenos Aires',           lat: -34.5667, lng: -59.1000 },
+  { cp: 6800, ciudad: 'Bragado',                           prov: 'Buenos Aires',           lat: -35.1167, lng: -60.4833 },
+  // ── Buenos Aires Sur / Costa Atlántica ───────────────────────────────────
+  { cp: 7000, ciudad: 'Tandil',                            prov: 'Buenos Aires',           lat: -37.3167, lng: -59.1333 },
+  { cp: 7100, ciudad: 'Dolores',                           prov: 'Buenos Aires',           lat: -36.3167, lng: -57.6833 },
+  { cp: 7300, ciudad: 'Azul',                              prov: 'Buenos Aires',           lat: -36.7833, lng: -59.8667 },
+  { cp: 7400, ciudad: 'Olavarría',                         prov: 'Buenos Aires',           lat: -36.8833, lng: -60.3167 },
+  { cp: 7500, ciudad: 'Tres Arroyos',                      prov: 'Buenos Aires',           lat: -38.3667, lng: -60.2833 },
+  { cp: 7600, ciudad: 'Mar del Plata',                     prov: 'Buenos Aires',           lat: -38.0000, lng: -57.5667 },
+  { cp: 7700, ciudad: 'Necochea',                          prov: 'Buenos Aires',           lat: -38.5500, lng: -58.7333 },
+  { cp: 7900, ciudad: 'Miramar / Gral. Alvarado',          prov: 'Buenos Aires',           lat: -38.2667, lng: -57.8333 },
+  // ── Patagonia Norte ───────────────────────────────────────────────────────
+  { cp: 8000, ciudad: 'Bahía Blanca',                      prov: 'Buenos Aires',           lat: -38.7183, lng: -62.2661 },
+  { cp: 8100, ciudad: 'Punta Alta',                        prov: 'Buenos Aires',           lat: -38.8833, lng: -62.0667 },
+  { cp: 8200, ciudad: 'Río Colorado',                      prov: 'Río Negro',              lat: -38.9833, lng: -64.1000 },
+  { cp: 8300, ciudad: 'Neuquén',                           prov: 'Neuquén',                lat: -38.9516, lng: -68.0591 },
+  { cp: 8370, ciudad: 'Zapala',                            prov: 'Neuquén',                lat: -38.8883, lng: -70.0625 },
+  { cp: 8400, ciudad: 'San Carlos de Bariloche',           prov: 'Río Negro',              lat: -41.1335, lng: -71.3103 },
+  { cp: 8430, ciudad: 'El Bolsón',                         prov: 'Río Negro',              lat: -41.9667, lng: -71.5333 },
+  { cp: 8500, ciudad: 'Viedma',                            prov: 'Río Negro',              lat: -40.8135, lng: -62.9967 },
+  { cp: 8520, ciudad: 'General Roca',                      prov: 'Río Negro',              lat: -39.0333, lng: -67.5833 },
+  // ── Patagonia Sur ─────────────────────────────────────────────────────────
+  { cp: 9000, ciudad: 'Comodoro Rivadavia',                prov: 'Chubut',                 lat: -45.8667, lng: -67.5000 },
+  { cp: 9100, ciudad: 'Trelew',                            prov: 'Chubut',                 lat: -43.2500, lng: -65.3333 },
+  { cp: 9105, ciudad: 'Puerto Madryn',                     prov: 'Chubut',                 lat: -42.7692, lng: -65.0385 },
+  { cp: 9200, ciudad: 'Esquel',                            prov: 'Chubut',                 lat: -42.9067, lng: -71.3153 },
+  { cp: 9300, ciudad: 'Rawson',                            prov: 'Chubut',                 lat: -43.3002, lng: -65.1023 },
+  { cp: 9400, ciudad: 'Río Gallegos',                      prov: 'Santa Cruz',             lat: -51.6226, lng: -69.2181 },
+  { cp: 9405, ciudad: 'El Calafate',                       prov: 'Santa Cruz',             lat: -50.3397, lng: -72.2653 },
+  { cp: 9410, ciudad: 'Ushuaia',                           prov: 'Tierra del Fuego',       lat: -54.8019, lng: -68.3030 },
+  { cp: 9420, ciudad: 'Río Grande',                        prov: 'Tierra del Fuego',       lat: -53.7878, lng: -67.7073 },
+];
+
+const FACTOR_RUTA = 1.35;
+const LS_KEY = 'cp-calc-tarifas';
+
+// ════════════════════════════════════════════════════════════════════════════
+//  HAVERSINE
+// ════════════════════════════════════════════════════════════════════════════
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const toRad = x => x * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2
+          + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2))
+          * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  BUSCAR CP
+// ════════════════════════════════════════════════════════════════════════════
+function buscarCP(str) {
+  const num = parseInt(str.trim().replace(/\D/g, ''));
+  if (isNaN(num) || num < 1000 || num > 9999) return null;
+
+  return CP_DB.reduce((mejor, ref) => {
+    const diff = Math.abs(ref.cp - num);
+    return diff < Math.abs(mejor.cp - num) ? ref : mejor;
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  FORMATO MONEDA
+// ════════════════════════════════════════════════════════════════════════════
+function ars(n) {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency', currency: 'ARS',
+    minimumFractionDigits: 0, maximumFractionDigits: 0,
+  }).format(n);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  LOCALSTORAGE — guardar y cargar tarifas
+// ════════════════════════════════════════════════════════════════════════════
+function saveTarifas() {
+  localStorage.setItem(LS_KEY, JSON.stringify({
+    tarifaBase:  document.getElementById('tarifaBase').value,
+    precioPorKm: document.getElementById('precioPorKm').value,
+    precioPorKg: document.getElementById('precioPorKg').value,
+  }));
+}
+
+function loadTarifas() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(LS_KEY));
+    if (!stored) return;
+    if (stored.tarifaBase  != null) document.getElementById('tarifaBase').value  = stored.tarifaBase;
+    if (stored.precioPorKm != null) document.getElementById('precioPorKm').value = stored.precioPorKm;
+    if (stored.precioPorKg != null) document.getElementById('precioPorKg').value = stored.precioPorKg;
+  } catch {}
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  PREVIEW EN VIVO DE CP
+// ════════════════════════════════════════════════════════════════════════════
+function updatePreview(inputId, previewId) {
+  const ref = buscarCP(document.getElementById(inputId).value);
+  document.getElementById(previewId).textContent = ref ? `→ ${ref.ciudad}, ${ref.prov}` : '';
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  CALCULAR
+// ════════════════════════════════════════════════════════════════════════════
+function calcular() {
+  const elOrig  = document.getElementById('cpOrigen');
+  const elDest  = document.getElementById('cpDestino');
+  const errOrig = document.getElementById('errOrigen');
+  const errDest = document.getElementById('errDestino');
+
+  [elOrig, elDest].forEach(el => el.classList.remove('invalid'));
+  [errOrig, errDest].forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+
+  let ok = true;
+  if (!elOrig.value.trim()) {
+    setError(elOrig, errOrig, 'Ingresá el código postal de origen.');
+    ok = false;
+  }
+  if (!elDest.value.trim()) {
+    setError(elDest, errDest, 'Ingresá el código postal de destino.');
+    ok = false;
+  }
+  if (!ok) return;
+
+  const origen  = buscarCP(elOrig.value);
+  const destino = buscarCP(elDest.value);
+
+  if (!origen) {
+    setError(elOrig, errOrig, 'CP inválido. Usá 4 dígitos (ej: 1000).');
+    ok = false;
+  }
+  if (!destino) {
+    setError(elDest, errDest, 'CP inválido. Usá 4 dígitos (ej: 5000).');
+    ok = false;
+  }
+  if (!ok) return;
+
+  const tarifaBase  = Math.max(0, parseFloat(document.getElementById('tarifaBase').value)  || 0);
+  const precioPorKm = Math.max(0, parseFloat(document.getElementById('precioPorKm').value) || 0);
+  const precioPorKg = Math.max(0, parseFloat(document.getElementById('precioPorKg').value) || 0);
+  const pesoReal    = Math.max(0, parseFloat(document.getElementById('pesoKg').value)      || 0);
+
+  const pesoVol       = calcularPesoVol();
+  const usaVol        = pesoVol !== null && pesoVol > pesoReal;
+  const pesoFacturado = pesoVol !== null ? Math.max(pesoReal, pesoVol) : pesoReal;
+
+  const kmAereo = haversine(origen.lat, origen.lng, destino.lat, destino.lng);
+  const kmRuta  = kmAereo * FACTOR_RUTA;
+  const costo   = tarifaBase + precioPorKm * kmRuta + precioPorKg * pesoFacturado;
+
+  const card = document.getElementById('resultCard');
+  card.classList.remove('show');
+  void card.offsetWidth;
+  card.classList.add('show');
+
+  document.getElementById('resRoute').innerHTML =
+    `<span>📍 <strong>${origen.ciudad}</strong> (CP ${elOrig.value.trim()}) · ${origen.prov}</span>
+     <span class="arrow">→</span>
+     <span>📍 <strong>${destino.ciudad}</strong> (CP ${elDest.value.trim()}) · ${destino.prov}</span>`;
+
+  document.getElementById('distAerea').textContent = `${Math.round(kmAereo)} km`;
+  document.getElementById('distRuta').textContent  = `${Math.round(kmRuta)} km`;
+  const pesoLabel = usaVol
+    ? `${pesoFacturado.toFixed(2)} kg (vol.)`
+    : `${pesoFacturado} kg`;
+  document.getElementById('chipPeso').textContent  = pesoLabel;
+  document.getElementById('costoTotal').textContent = ars(costo);
+
+  let breakdown = `Base ${ars(tarifaBase)} + ${Math.round(kmRuta)} km × ${ars(precioPorKm)}/km + ${pesoFacturado.toFixed(2)} kg × ${ars(precioPorKg)}/kg`;
+  if (pesoVol !== null) {
+    breakdown += ` · real ${pesoReal} kg / vol. ${pesoVol.toFixed(2)} kg`;
+  }
+  document.getElementById('costoBreakdown').textContent = breakdown;
+
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  PESO VOLUMÉTRICO
+// ════════════════════════════════════════════════════════════════════════════
+function calcularPesoVol() {
+  if (!document.getElementById('usarVolumen').checked) return null;
+  const l = parseFloat(document.getElementById('largo').value) || 0;
+  const w = parseFloat(document.getElementById('ancho').value) || 0;
+  const h = parseFloat(document.getElementById('alto').value) || 0;
+  if (l <= 0 || w <= 0 || h <= 0) return null;
+  return (l * w * h) / 5000;
+}
+
+function toggleVolumen() {
+  const checked = document.getElementById('usarVolumen').checked;
+  document.getElementById('volumenSection').style.display = checked ? 'block' : 'none';
+  if (!checked) document.getElementById('volPreview').textContent = '';
+  else updateVolPreview();
+}
+
+function updateVolPreview() {
+  const l  = parseFloat(document.getElementById('largo').value) || 0;
+  const w  = parseFloat(document.getElementById('ancho').value) || 0;
+  const h  = parseFloat(document.getElementById('alto').value) || 0;
+  const el = document.getElementById('volPreview');
+  if (l > 0 && w > 0 && h > 0) {
+    const vol  = (l * w * h / 5000).toFixed(2);
+    const real = parseFloat(document.getElementById('pesoKg').value) || 0;
+    const fact = Math.max(real, parseFloat(vol)).toFixed(2);
+    el.textContent = `Peso volumétrico: ${vol} kg · Peso a facturar: ${fact} kg`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════════════════════
+function setError(input, span, msg) {
+  input.classList.add('invalid');
+  span.textContent = msg;
+  span.classList.add('show');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  INIT — event listeners
+// ════════════════════════════════════════════════════════════════════════════
+loadTarifas();
+
+['cpOrigen', 'cpDestino'].forEach(id => {
+  const previewId = id === 'cpOrigen' ? 'previewOrigen' : 'previewDestino';
+  document.getElementById(id).addEventListener('input', () => updatePreview(id, previewId));
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') calcular();
+  });
+});
+
+['tarifaBase', 'precioPorKm', 'precioPorKg'].forEach(id => {
+  document.getElementById(id).addEventListener('change', saveTarifas);
+});
+
+['largo', 'ancho', 'alto', 'pesoKg'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateVolPreview);
+});
+</script>
+</body>
+</html>

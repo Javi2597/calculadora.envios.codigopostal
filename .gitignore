@@ -1,0 +1,5 @@
+# Claude Code internal files
+.claude/
+
+# Test files
+text.txt
