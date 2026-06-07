@@ -17,7 +17,7 @@ Herramienta web para estimar el costo de un envío entre dos códigos postales a
 
 ## Uso
 
-Abrí `calculadora-envios.html` directo en el navegador. No requiere servidor ni instalación.
+Abrí `index.html` directo en el navegador una vez descargada la carpeta o clonado el repo. No requiere servidor ni instalación.
 
 ```
 1. Configurá las tarifas (o dejá los valores por defecto)
